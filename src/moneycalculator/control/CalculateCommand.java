@@ -1,7 +1,6 @@
 package moneycalculator.control;
 
 import moneycalculator.model.Currency;
-import moneycalculator.model.ExchangeRate;
 import moneycalculator.model.Money;
 import moneycalculator.persistence.ExchangeRateLoader;
 import moneycalculator.ui.MoneyDialog;
@@ -13,7 +12,7 @@ public class CalculateCommand implements Command {
     private final MoneyDialog moneyDialog;
     private Currency eur = new Currency("EUR", "Euro", "€");
 
-    public CalculateCommand(ExchangeRateLoader loader, MoneyDisplay moneyDisplay, MoneyDialog moneyDialog) {
+    public CalculateCommand(MoneyDisplay moneyDisplay, MoneyDialog moneyDialog, ExchangeRateLoader loader) {
         this.loader = loader;
         this.moneyDisplay = moneyDisplay;
         this.moneyDialog = moneyDialog;
@@ -31,8 +30,11 @@ public class CalculateCommand implements Command {
     }
 
     private Money exchange(Money money) {
-        ExchangeRate exchangeRate = loader.load(money.getCurrency(), eur);
-        return new Money(money.getAmount()*exchangeRate.getRate(), eur);
+        return new Money(money.getAmount() * rateOf(money.getCurrency()),eur);
+    }
+
+    private double rateOf(Currency currency) {
+        return loader.load(currency, eur).getRate();
     }
     
 }
